@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Leave Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Leave System</h2>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="/leave-request.html">Request Leave</a></li>
+        <li><a href="/balance.html">My Balances</a></li>
+        <li><a href="/calendar.html">Calendar</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="user-info">
+          <span id="userName">Loading...</span>
+          <span class="role-badge employee" id="userRole">Employee</span>
+        </div>
+        <button class="btn-logout" onclick="removeToken()">Logout</button>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+        <h1>Dashboard</h1>
+
+        <!-- Stats Cards -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-value" id="totalRemaining">0</div>
+            <div class="stat-label">Total Days Available</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="pendingCount">0</div>
+            <div class="stat-label">Pending Requests</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="approvedCount">0</div>
+            <div class="stat-label">Approved This Year</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="nextLeave">-</div>
+            <div class="stat-label">Next Leave</div>
+          </div>
+        </div>
+
+        <!-- Leave Balance Summary -->
+        <div class="card">
+          <div class="card-header">Leave Balance Summary</div>
+          <div id="balanceCharts"></div>
+        </div>
+
+        <!-- Recent Leave Requests -->
+        <div class="card">
+          <div class="card-header flex justify-between align-center">
+            <span>Recent Leave Requests</span>
+            <a href="/leave-request.html" class="btn btn-primary btn-sm">Request Leave</a>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Days</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody id="recentLeaves">
+                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Leave Details Modal -->
+  <div class="modal-overlay" id="leaveModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Leave Request Details</h3>
+      </div>
+      <div class="modal-body" id="leaveDetails"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

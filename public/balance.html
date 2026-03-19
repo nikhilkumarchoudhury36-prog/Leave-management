@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leave Balances - Leave Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Leave System</h2>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard.html">Dashboard</a></li>
+        <li><a href="/leave-request.html">Request Leave</a></li>
+        <li><a href="/balance.html" class="active">My Balances</a></li>
+        <li><a href="/calendar.html">Calendar</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="user-info">
+          <span id="userName">Loading...</span>
+          <span class="role-badge employee" id="userRole">Employee</span>
+        </div>
+        <button class="btn-logout" onclick="removeToken()">Logout</button>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+        <h1>Leave Balances</h1>
+
+        <!-- Summary Card -->
+        <div class="card" style="max-width: 400px; text-align: center; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white);">
+          <div style="font-size: 3rem; font-weight: 700;" id="totalRemaining">0</div>
+          <div style="font-size: 1.125rem;">Total Days Remaining</div>
+        </div>
+
+        <!-- Balance Table -->
+        <div class="card">
+          <div class="card-header">Leave Balance Details</div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Leave Type</th>
+                  <th>Total Entitlement</th>
+                  <th>Used</th>
+                  <th>Remaining</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="balanceTable">
+                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/balance.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Dashboard - Leave Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Leave System</h2>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a href="/manager-dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="/calendar.html">Calendar</a></li>
+        <li><a href="/dashboard.html">My Leaves</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="user-info">
+          <span id="userName">Loading...</span>
+          <span class="role-badge manager" id="userRole">Manager</span>
+        </div>
+        <button class="btn-logout" onclick="removeToken()">Logout</button>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+        <h1>Manager Dashboard</h1>
+
+        <!-- Stats Cards -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-value" id="pendingCount">0</div>
+            <div class="stat-label">Pending Approvals</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="approvedToday">0</div>
+            <div class="stat-label">Approved Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="rejectedToday">0</div>
+            <div class="stat-label">Rejected Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="teamSize">0</div>
+            <div class="stat-label">Team Members</div>
+          </div>
+        </div>
+
+        <!-- Pending Approvals -->
+        <div class="card">
+          <div class="card-header">Pending Approvals</div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Department</th>
+                  <th>Leave Type</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Days</th>
+                  <th>Submitted</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="pendingRequests">
+                <tr><td colspan="8" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Team Overview -->
+        <div class="card">
+          <div class="card-header">Team Overview</div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Employee ID</th>
+                  <th>Department</th>
+                  <th>Email</th>
+                  <th>Leave Balances</th>
+                </tr>
+              </thead>
+              <tbody id="teamOverview">
+                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><span id="reviewAction">Review</span> Leave Request</h3>
+      </div>
+      <div class="modal-body">
+        <div id="reviewSummary" style="margin-bottom: 20px;"></div>
+        <div class="form-group">
+          <label for="reviewComment">Comment</label>
+          <textarea id="reviewComment" class="form-control" placeholder="Add a comment (required for rejection)"></textarea>
+          <div class="error-message" id="reviewCommentError"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeReviewModal()">Cancel</button>
+        <button id="confirmReview" class="btn btn-success">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/managerDashboard.js"></script>
+</body>
+</html>

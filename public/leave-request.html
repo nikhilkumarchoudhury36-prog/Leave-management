@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Leave - Leave Management</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Leave System</h2>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a href="/dashboard.html">Dashboard</a></li>
+        <li><a href="/leave-request.html" class="active">Request Leave</a></li>
+        <li><a href="/balance.html">My Balances</a></li>
+        <li><a href="/calendar.html">Calendar</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="user-info">
+          <span id="userName">Loading...</span>
+          <span class="role-badge employee" id="userRole">Employee</span>
+        </div>
+        <button class="btn-logout" onclick="removeToken()">Logout</button>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+        <h1>Request Leave</h1>
+
+        <div class="card" style="max-width: 600px;">
+          <form id="leaveRequestForm">
+            <div class="form-group">
+              <label for="leaveType">Leave Type</label>
+              <select id="leaveType" class="form-control" required>
+                <option value="">Select leave type...</option>
+              </select>
+              <div class="error-message" id="leaveTypeError"></div>
+            </div>
+
+            <div id="balanceInfo" class="hidden" style="padding: 10px; background-color: var(--gray-100); border-radius: 6px; margin-bottom: 15px;">
+              <strong>Available Balance:</strong> <span id="availableBalance">-</span> days
+            </div>
+
+            <div class="form-group">
+              <label for="startDate">Start Date</label>
+              <input type="date" id="startDate" class="form-control" required>
+              <div class="error-message" id="startDateError"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="endDate">End Date</label>
+              <input type="date" id="endDate" class="form-control" required>
+              <div class="error-message" id="endDateError"></div>
+            </div>
+
+            <div id="workingDaysInfo" class="hidden" style="padding: 10px; background-color: var(--primary-light); color: var(--white); border-radius: 6px; margin-bottom: 15px;">
+              <strong>Working Days:</strong> <span id="workingDays">0</span> days
+            </div>
+
+            <div class="form-group">
+              <label for="reason">Reason</label>
+              <textarea id="reason" class="form-control" required minlength="10" placeholder="Please provide a reason for your leave request (minimum 10 characters)"></textarea>
+              <div class="error-message" id="reasonError"></div>
+            </div>
+
+            <div class="flex gap-10">
+              <button type="submit" class="btn btn-primary">Submit Request</button>
+              <a href="/dashboard.html" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/leaveForm.js"></script>
+</body>
+</html>
