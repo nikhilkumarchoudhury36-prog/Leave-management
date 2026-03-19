@@ -83,17 +83,6 @@ exports.reviewRequest = async (req, res) => {
       );
     }
 
-    // Emit real-time notification to the employee
-    const io = req.app.get('io');
-    if (io) {
-      io.to(`user_${request.user_id}`).emit('leaveReviewed', {
-        id,
-        status: action,
-        comment,
-        reviewedBy: `${req.user.firstName} ${req.user.lastName}`
-      });
-    }
-
     res.json({ message: `Leave request ${action} successfully` });
   } catch (error) {
     console.error('Review request error:', error);

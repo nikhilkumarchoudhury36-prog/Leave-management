@@ -138,26 +138,6 @@ exports.createLeave = async (req, res) => {
       [userId, leaveTypeId, startDate, endDate, totalDays, reason]
     );
 
-    // Get user and leave type details for notification
-    const [userDetails] = await db.query(
-      'SELECT u.first_name, u.last_name, u.manager_id, lt.name as leave_type FROM users u JOIN leave_types lt ON lt.id = ? WHERE u.id = ?',
-      [leaveTypeId, userId]
-    );
-
-    // Emit real-time notification to managers
-    const io = req.app.get('io');
-    if (io && userDetails[0].manager_id) {
-      io.to('managers').emit('newLeaveRequest', {
-        id: result.insertId,
-        employeeName: `${userDetails[0].first_name} ${userDetails[0].last_name}`,
-        leaveType: userDetails[0].leave_type,
-        startDate,
-        endDate,
-        totalDays,
-        reason
-      });
-    }
-
     res.status(201).json({ 
       message: 'Leave request submitted successfully',
       id: result.insertId
