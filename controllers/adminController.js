@@ -46,7 +46,7 @@ exports.reviewRequest = async (req, res) => {
 
     // Get leave request details
     const [requests] = await db.query(
-      `SELECT lr.*, u.manager_id 
+      `SELECT lr.*, u.manager_id, u.first_name, u.last_name 
        FROM leave_requests lr
        JOIN users u ON lr.user_id = u.id
        WHERE lr.id = ?`,
@@ -81,6 +81,17 @@ exports.reviewRequest = async (req, res) => {
         'UPDATE leave_balances SET used_days = used_days + ? WHERE user_id = ? AND leave_type_id = ? AND year = ?',
         [request.total_days, request.user_id, request.leave_type_id, year]
       );
+    }
+
+    // Emit real-time notification to the employee
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${request.user_id}`).emit('leaveReviewed', {
+        id,
+        status: action,
+        comment,
+        reviewedBy: `${req.user.firstName} ${req.user.lastName}`
+      });
     }
 
     res.json({ message: `Leave request ${action} successfully` });

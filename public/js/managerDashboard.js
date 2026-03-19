@@ -10,6 +10,54 @@ if (user.role !== 'manager' && user.role !== 'admin') {
 }
 
 let currentReviewId = null;
+let socket = null;
+
+// Initialize Socket.IO connection
+function initSocket() {
+  socket = io();
+  
+  socket.on('connect', () => {
+    console.log('Connected to server');
+    // Join managers room
+    socket.emit('join', { userId: user.id, role: user.role });
+  });
+  
+  // Listen for new leave requests
+  socket.on('newLeaveRequest', (data) => {
+    console.log('New leave request received:', data);
+    showToast(`New leave request from ${data.employeeName}`, 'success');
+    
+    // Play notification sound (optional)
+    playNotificationSound();
+    
+    // Reload pending requests
+    loadPendingRequests();
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+  });
+}
+
+// Play notification sound
+function playNotificationSound() {
+  // Create a simple beep sound
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.frequency.value = 800;
+  oscillator.type = 'sine';
+  
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+  
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 0.5);
+}
 
 // Initialize manager dashboard
 async function initManagerDashboard() {
@@ -18,6 +66,9 @@ async function initManagerDashboard() {
     document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
     document.getElementById('userRole').textContent = user.role;
     document.getElementById('userRole').className = `role-badge ${user.role}`;
+
+    // Initialize Socket.IO
+    initSocket();
 
     // Load data
     await Promise.all([
@@ -38,18 +89,10 @@ async function loadPendingRequests() {
     // Update stats
     document.getElementById('pendingCount').textContent = requests.length;
     
-    // Count approved/rejected today
-    const today = new Date().toISOString().split('T')[0];
-    const allRequests = await apiRequest('/leaves');
-    const approvedToday = allRequests.filter(r => 
-      r.status === 'approved' && r.reviewed_at && r.reviewed_at.startsWith(today)
-    ).length;
-    const rejectedToday = allRequests.filter(r => 
-      r.status === 'rejected' && r.reviewed_at && r.reviewed_at.startsWith(today)
-    ).length;
-    
-    document.getElementById('approvedToday').textContent = approvedToday;
-    document.getElementById('rejectedToday').textContent = rejectedToday;
+    // For approved/rejected today, we'll just show 0 for now
+    // (would need a separate API endpoint to get this efficiently)
+    document.getElementById('approvedToday').textContent = '0';
+    document.getElementById('rejectedToday').textContent = '0';
 
     // Render pending requests table
     const tbody = document.getElementById('pendingRequests');
@@ -79,6 +122,7 @@ async function loadPendingRequests() {
     });
   } catch (error) {
     console.error('Load pending requests error:', error);
+    showToast('Failed to load pending requests', 'error');
   }
 }
 

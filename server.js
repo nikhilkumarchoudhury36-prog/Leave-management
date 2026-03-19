@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const http = require('http');
+const socketIo = require('socket.io');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -12,7 +14,18 @@ const balanceRoutes = require('./routes/balanceRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
 const PORT = process.env.PORT || 3000;
+
+// Make io accessible to routes
+app.set('io', io);
 
 // Middleware
 app.use(cors());
@@ -21,6 +34,24 @@ app.use(morgan('dev'));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+  
+  // Join room based on user role
+  socket.on('join', (data) => {
+    if (data.role === 'manager' || data.role === 'admin') {
+      socket.join('managers');
+      console.log(`Manager ${data.userId} joined managers room`);
+    }
+    socket.join(`user_${data.userId}`);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -38,6 +69,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

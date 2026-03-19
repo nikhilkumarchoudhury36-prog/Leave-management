@@ -4,6 +4,33 @@ if (!requireAuth()) {
 }
 
 const user = getUser();
+let socket = null;
+
+// Initialize Socket.IO connection
+function initSocket() {
+  socket = io();
+  
+  socket.on('connect', () => {
+    console.log('Connected to server');
+    // Join user-specific room
+    socket.emit('join', { userId: user.id, role: user.role });
+  });
+  
+  // Listen for leave review notifications
+  socket.on('leaveReviewed', (data) => {
+    console.log('Leave reviewed:', data);
+    const status = data.status === 'approved' ? 'success' : 'error';
+    showToast(`Your leave request has been ${data.status} by ${data.reviewedBy}`, status);
+    
+    // Reload dashboard data
+    loadBalances();
+    loadRecentLeaves();
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+  });
+}
 
 // Initialize dashboard
 async function initDashboard() {
@@ -12,6 +39,9 @@ async function initDashboard() {
     document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
     document.getElementById('userRole').textContent = user.role;
     document.getElementById('userRole').className = `role-badge ${user.role}`;
+
+    // Initialize Socket.IO
+    initSocket();
 
     // Load data
     await Promise.all([
