@@ -2,6 +2,17 @@
 
 A full-stack web application for managing employee leave requests, built with Node.js, Express, MySQL, and vanilla JavaScript.
 
+## 🚀 Live Demo
+
+**Deployed on Railway:** [https://leave-management-production-55dd.up.railway.app](https://leave-management-production-55dd.up.railway.app)
+
+### Test Accounts
+- **Manager:** manager@company.com / Admin@123
+- **Employee:** john.doe@company.com / Admin@123
+- Or register your own account!
+
+---
+
 ## Features
 
 - User authentication with JWT
@@ -95,13 +106,17 @@ http://localhost:3000
 
 ## Default Login Credentials
 
+### Production (Railway)
 | Role | Email | Password |
 |------|-------|----------|
+| Admin | admin@company.com | Admin@123 |
 | Manager | manager@company.com | Admin@123 |
-| Employee 1 | emp1@company.com | Emp@1234 |
-| Employee 2 | emp2@company.com | Emp@1234 |
-| Employee 3 | emp3@company.com | Emp@1234 |
-| Employee 4 | emp4@company.com | Emp@1234 |
+| Employee | john.doe@company.com | Admin@123 |
+| Employee | jane.smith@company.com | Admin@123 |
+| Employee | bob.wilson@company.com | Admin@123 |
+
+### Local Development
+After running `npm run setup`, use the same credentials as above.
 
 ## API Endpoints
 
@@ -194,6 +209,20 @@ Change the PORT in `.env` file to a different value (e.g., 3001)
 
 ### Token Expired Errors
 Tokens expire after 8 hours. Simply log in again to get a new token.
+
+## Deployment
+
+This application is deployed on Railway. For deployment instructions, see:
+- `DEPLOYMENT_COMPLETE.md` - Full deployment guide
+- `RAILWAY_DEPLOYMENT_FIX.md` - Railway-specific setup
+
+### Quick Deploy to Railway
+1. Fork this repository
+2. Create a Railway account
+3. Create new project from GitHub repo
+4. Add MySQL service
+5. Set environment variables (JWT_SECRET, MYSQL_URL)
+6. Deploy!
 
 ## Future Enhancements
 
