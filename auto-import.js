@@ -53,54 +53,23 @@ async function importToRailway() {
     // Read schema file
     console.log('📖 Reading schema file...');
     const schemaPath = './database/schema-railway.sql';
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+    let schema = fs.readFileSync(schemaPath, 'utf8');
 
-    // Split into individual statements
-    const statements = schema
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--') && s !== 'USE railway');
+    // Remove comments and clean up
+    schema = schema
+      .split('\n')
+      .filter(line => !line.trim().startsWith('--'))
+      .join('\n');
 
-    console.log(`📝 Found ${statements.length} SQL statements\n`);
+    // Execute the entire schema at once using multipleStatements
     console.log('⚙️  Executing SQL statements...\n');
-
-    // Execute each statement
-    for (let i = 0; i < statements.length; i++) {
-      const statement = statements[i];
-      
-      if (!statement || statement.trim() === '') continue;
-
-      try {
-        await connection.execute(statement);
-        
-        // Show progress for important operations
-        if (statement.includes('DROP TABLE')) {
-          console.log('🗑️  Cleaned up old tables');
-        } else if (statement.includes('CREATE TABLE users')) {
-          console.log('✅ Created users table');
-        } else if (statement.includes('CREATE TABLE leave_types')) {
-          console.log('✅ Created leave_types table');
-        } else if (statement.includes('CREATE TABLE leave_balances')) {
-          console.log('✅ Created leave_balances table');
-        } else if (statement.includes('CREATE TABLE leave_requests')) {
-          console.log('✅ Created leave_requests table');
-        } else if (statement.includes('CREATE TABLE holidays')) {
-          console.log('✅ Created holidays table');
-        } else if (statement.includes('INSERT INTO users')) {
-          console.log('✅ Inserted 5 users (password: Admin@123)');
-        } else if (statement.includes('INSERT INTO leave_types')) {
-          console.log('✅ Inserted 4 leave types');
-        } else if (statement.includes('INSERT INTO leave_balances')) {
-          console.log('✅ Inserted 20 leave balances');
-        } else if (statement.includes('INSERT INTO holidays')) {
-          console.log('✅ Inserted 6 holidays');
-        }
-      } catch (err) {
-        // Ignore "doesn't exist" errors for DROP statements
-        if (!err.message.includes("doesn't exist")) {
-          console.error(`⚠️  Warning: ${err.message.substring(0, 100)}`);
-        }
-      }
+    
+    try {
+      await connection.query(schema);
+      console.log('✅ All SQL statements executed successfully!\n');
+    } catch (err) {
+      console.error(`❌ Error executing schema: ${err.message}`);
+      throw err;
     }
 
     // Verify the import
