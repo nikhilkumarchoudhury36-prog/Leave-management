@@ -34,12 +34,20 @@ exports.register = async (req, res) => {
     const employeeId = `EMP${String(countResult[0].count + 1).padStart(3, '0')}`;
     console.log('Generated employee ID:', employeeId);
 
-    // Get first manager to assign
+    // Get first manager to assign (prefer 'manager' role over 'admin')
     console.log('Finding manager...');
     const [managers] = await db.query(
-      'SELECT id FROM users WHERE role IN ("manager", "admin") ORDER BY id LIMIT 1'
+      'SELECT id FROM users WHERE role = "manager" ORDER BY id LIMIT 1'
     );
-    const managerId = managers.length > 0 ? managers[0].id : null;
+    let managerId = managers.length > 0 ? managers[0].id : null;
+    
+    // If no manager found, try admin
+    if (!managerId) {
+      const [admins] = await db.query(
+        'SELECT id FROM users WHERE role = "admin" ORDER BY id LIMIT 1'
+      );
+      managerId = admins.length > 0 ? admins[0].id : null;
+    }
     console.log('Assigned manager ID:', managerId);
 
     // Insert user
