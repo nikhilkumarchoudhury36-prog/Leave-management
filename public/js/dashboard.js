@@ -40,6 +40,9 @@ async function initDashboard() {
     document.getElementById('userRole').textContent = user.role;
     document.getElementById('userRole').className = `role-badge ${user.role}`;
 
+    // Populate navigation based on role
+    populateNavigation();
+
     // Initialize Socket.IO
     initSocket();
 
@@ -51,6 +54,26 @@ async function initDashboard() {
   } catch (error) {
     console.error('Dashboard init error:', error);
     showToast('Failed to load dashboard data', 'error');
+  }
+}
+
+// Populate navigation based on user role
+function populateNavigation() {
+  const sidebarNav = document.getElementById('sidebarNav');
+  
+  if (user.role === 'manager' || user.role === 'admin') {
+    sidebarNav.innerHTML = `
+      <li><a href="/manager-dashboard.html">Dashboard</a></li>
+      <li><a href="/calendar.html">Calendar</a></li>
+      <li><a href="/dashboard.html" class="active">My Leaves</a></li>
+    `;
+  } else {
+    sidebarNav.innerHTML = `
+      <li><a href="/dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="/leave-request.html">Request Leave</a></li>
+      <li><a href="/balance.html">My Balances</a></li>
+      <li><a href="/calendar.html">Calendar</a></li>
+    `;
   }
 }
 

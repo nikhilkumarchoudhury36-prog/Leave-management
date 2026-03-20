@@ -14,6 +14,10 @@ async function initForm() {
     // Update user info
     document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
     document.getElementById('userRole').textContent = user.role;
+    document.getElementById('userRole').className = `role-badge ${user.role}`;
+
+    // Populate navigation based on role
+    populateNavigation();
 
     // Load data
     await Promise.all([
@@ -36,6 +40,27 @@ async function initForm() {
   } catch (error) {
     console.error('Form init error:', error);
     showToast('Failed to initialize form', 'error');
+  }
+}
+
+// Populate navigation based on user role
+function populateNavigation() {
+  const sidebarNav = document.getElementById('sidebarNav');
+  
+  if (user.role === 'manager' || user.role === 'admin') {
+    sidebarNav.innerHTML = `
+      <li><a href="/manager-dashboard.html">Dashboard</a></li>
+      <li><a href="/calendar.html">Calendar</a></li>
+      <li><a href="/dashboard.html">My Leaves</a></li>
+      <li><a href="/leave-request.html" class="active">Request Leave</a></li>
+    `;
+  } else {
+    sidebarNav.innerHTML = `
+      <li><a href="/dashboard.html">Dashboard</a></li>
+      <li><a href="/leave-request.html" class="active">Request Leave</a></li>
+      <li><a href="/balance.html">My Balances</a></li>
+      <li><a href="/calendar.html">Calendar</a></li>
+    `;
   }
 }
 
