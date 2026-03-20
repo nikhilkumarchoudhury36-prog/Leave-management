@@ -6,9 +6,12 @@ const db = require('../config/db');
 // Register new employee
 exports.register = async (req, res) => {
   try {
+    console.log('Registration attempt:', { email: req.body.email, department: req.body.department });
+    
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -17,27 +20,43 @@ exports.register = async (req, res) => {
     // Check if email already exists
     const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0) {
+      console.log('Email already exists:', email);
       return res.status(400).json({ error: 'Email already registered' });
     }
 
     // Hash password
+    console.log('Hashing password...');
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Generate employee_id
+    console.log('Generating employee ID...');
     const [countResult] = await db.query('SELECT COUNT(*) as count FROM users');
     const employeeId = `EMP${String(countResult[0].count + 1).padStart(3, '0')}`;
+    console.log('Generated employee ID:', employeeId);
+
+    // Get first manager to assign
+    console.log('Finding manager...');
+    const [managers] = await db.query(
+      'SELECT id FROM users WHERE role IN ("manager", "admin") ORDER BY id LIMIT 1'
+    );
+    const managerId = managers.length > 0 ? managers[0].id : null;
+    console.log('Assigned manager ID:', managerId);
 
     // Insert user
+    console.log('Inserting user...');
     const [result] = await db.query(
-      'INSERT INTO users (employee_id, first_name, last_name, email, password_hash, department) VALUES (?, ?, ?, ?, ?, ?)',
-      [employeeId, firstName, lastName, email, passwordHash, department]
+      'INSERT INTO users (employee_id, first_name, last_name, email, password_hash, department, manager_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [employeeId, firstName, lastName, email, passwordHash, department, managerId]
     );
 
     const userId = result.insertId;
+    console.log('User created with ID:', userId);
 
     // Create leave balances for current year
+    console.log('Creating leave balances...');
     const currentYear = new Date().getFullYear();
     const [leaveTypes] = await db.query('SELECT id, default_days FROM leave_types');
+    console.log('Found leave types:', leaveTypes.length);
     
     for (const leaveType of leaveTypes) {
       await db.query(
@@ -45,21 +64,24 @@ exports.register = async (req, res) => {
         [userId, leaveType.id, currentYear, leaveType.default_days]
       );
     }
+    console.log('Leave balances created');
 
+    console.log('Registration successful for:', email);
     res.status(201).json({ 
       message: 'Registration successful', 
       employeeId 
     });
   } catch (error) {
-    console.error('Register error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      code: error.code,
-      sqlMessage: error.sqlMessage
-    });
+    console.error('=== REGISTRATION ERROR ===');
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('SQL message:', error.sqlMessage);
+    console.error('Stack:', error.stack);
+    console.error('========================');
+    
     res.status(500).json({ 
       error: 'Registration failed',
-      details: error.message 
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

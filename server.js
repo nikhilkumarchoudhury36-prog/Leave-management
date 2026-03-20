@@ -60,6 +60,36 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/balances', balanceRoutes);
 app.use('/api/calendar', calendarRoutes);
 
+// Health check and database test endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    const db = require('./config/db');
+    const [result] = await db.query('SELECT 1 + 1 as result');
+    const [users] = await db.query('SELECT COUNT(*) as count FROM users');
+    const [leaveTypes] = await db.query('SELECT COUNT(*) as count FROM leave_types');
+    const [managers] = await db.query('SELECT COUNT(*) as count FROM users WHERE role IN ("manager", "admin")');
+    
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      database: 'connected',
+      test: result[0].result,
+      stats: {
+        users: users[0].count,
+        leaveTypes: leaveTypes[0].count,
+        managers: managers[0].count
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+      code: error.code,
+      sqlMessage: error.sqlMessage
+    });
+  }
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error:', err);
