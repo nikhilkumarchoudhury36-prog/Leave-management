@@ -13,11 +13,35 @@ async function initBalancePage() {
     document.getElementById('userRole').textContent = user.role;
     document.getElementById('userRole').className = `role-badge ${user.role}`;
 
+    // Populate navigation based on role
+    populateNavigation();
+
     // Load balances
     await loadBalances();
   } catch (error) {
     console.error('Balance page init error:', error);
     showToast('Failed to load balance data', 'error');
+  }
+}
+
+// Populate navigation based on user role
+function populateNavigation() {
+  const sidebarNav = document.getElementById('sidebarNav');
+  
+  if (user.role === 'manager' || user.role === 'admin') {
+    sidebarNav.innerHTML = `
+      <li><a href="/manager-dashboard.html">Dashboard</a></li>
+      <li><a href="/calendar.html">Calendar</a></li>
+      <li><a href="/dashboard.html">My Leaves</a></li>
+      <li><a href="/balance.html" class="active">My Balances</a></li>
+    `;
+  } else {
+    sidebarNav.innerHTML = `
+      <li><a href="/dashboard.html">Dashboard</a></li>
+      <li><a href="/leave-request.html">Request Leave</a></li>
+      <li><a href="/balance.html" class="active">My Balances</a></li>
+      <li><a href="/calendar.html">Calendar</a></li>
+    `;
   }
 }
 

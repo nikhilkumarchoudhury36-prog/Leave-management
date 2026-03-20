@@ -15,6 +15,9 @@ async function initCalendar() {
     document.getElementById('userRole').textContent = user.role;
     document.getElementById('userRole').className = `role-badge ${user.role}`;
 
+    // Populate navigation based on role
+    populateNavigation();
+
     // Populate month/year selectors
     populateSelectors();
 
@@ -23,6 +26,26 @@ async function initCalendar() {
   } catch (error) {
     console.error('Calendar init error:', error);
     showToast('Failed to load calendar', 'error');
+  }
+}
+
+// Populate navigation based on user role
+function populateNavigation() {
+  const sidebarNav = document.getElementById('sidebarNav');
+  
+  if (user.role === 'manager' || user.role === 'admin') {
+    sidebarNav.innerHTML = `
+      <li><a href="/manager-dashboard.html">Dashboard</a></li>
+      <li><a href="/calendar.html" class="active">Calendar</a></li>
+      <li><a href="/dashboard.html">My Leaves</a></li>
+    `;
+  } else {
+    sidebarNav.innerHTML = `
+      <li><a href="/dashboard.html">Dashboard</a></li>
+      <li><a href="/leave-request.html">Request Leave</a></li>
+      <li><a href="/balance.html">My Balances</a></li>
+      <li><a href="/calendar.html" class="active">Calendar</a></li>
+    `;
   }
 }
 
