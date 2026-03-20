@@ -1,0 +1,222 @@
+═══════════════════════════════════════════════════════════════
+    RAILWAY DEPLOYMENT CHECKLIST - Fix Registration Issue
+═══════════════════════════════════════════════════════════════
+
+PROBLEM: Registration works locally but fails on Railway
+SOLUTION: Follow these steps in order
+
+───────────────────────────────────────────────────────────────
+STEP 1: VERIFY CODE IS DEPLOYED
+───────────────────────────────────────────────────────────────
+
+□ Go to https://railway.app
+□ Click "Leave-management" service
+□ Go to "Deployments" tab
+□ Latest deployment shows: ✅ Success (green checkmark)
+
+If FAILED:
+  → Click deployment → View Logs
+  → Copy error message
+  → Share for help
+
+───────────────────────────────────────────────────────────────
+STEP 2: ADD JWT_SECRET VARIABLE
+───────────────────────────────────────────────────────────────
+
+□ Click "Leave-management" service
+□ Go to "Variables" tab
+□ Check if JWT_SECRET exists
+
+If NOT exists:
+  □ Click "New Variable"
+  □ Name: JWT_SECRET
+  □ Value: my_super_secret_jwt_key_change_this_in_production_12345
+  □ Click "Add"
+  □ Wait 1-2 minutes for auto-redeploy
+  □ Check Deployments tab shows new deployment: Success
+
+───────────────────────────────────────────────────────────────
+STEP 3: VERIFY MYSQL SERVICE
+───────────────────────────────────────────────────────────────
+
+□ Click "MySQL" service
+□ Status shows: Online (green dot)
+□ Click "Connect" tab
+□ Copy these details:
+  
+  Host: _________________________________
+  Port: _________________________________
+  Username: root
+  Password: _____________________________
+  Database: railway
+
+───────────────────────────────────────────────────────────────
+STEP 4: IMPORT DATABASE SCHEMA
+───────────────────────────────────────────────────────────────
+
+□ Open MySQL Workbench
+□ Click "+" next to MySQL Connections
+□ Enter Railway connection details from Step 3
+□ Connection Name: Railway MySQL
+□ Click "Test Connection" → Should succeed
+□ Click "OK"
+□ Double-click "Railway MySQL" connection
+□ File → Open SQL Script
+□ Select: D:\management\database\schema.sql
+□ Click Execute (⚡ lightning bolt icon)
+□ Wait for execution (5-10 seconds)
+□ Should see multiple "OK" messages
+□ Refresh database in left sidebar
+□ Expand "railway" → "Tables"
+□ Verify these tables exist:
+  □ users
+  □ leave_types
+  □ leave_requests
+  □ leave_balances
+  □ holidays
+
+───────────────────────────────────────────────────────────────
+STEP 5: TEST HEALTH ENDPOINT
+───────────────────────────────────────────────────────────────
+
+□ Get your Railway app URL:
+  → Click "Leave-management" service
+  → Settings tab → Domains section
+  
+  Your URL: https://________________________________.railway.app
+
+□ Visit: https://your-app.railway.app/api/health
+
+Expected Response:
+  {
+    "status": "ok",
+    "timestamp": "2026-03-20T...",
+    "database": "connected",
+    "test": 2,
+    "stats": {
+      "users": 5,
+      "leaveTypes": 4,
+      "managers": 1
+    }
+  }
+
+If you see this: ✅ PROCEED TO STEP 6
+
+If you see error:
+  → Copy the error message
+  → Check Railway logs
+  → Share for help
+
+───────────────────────────────────────────────────────────────
+STEP 6: TEST REGISTRATION
+───────────────────────────────────────────────────────────────
+
+□ Go to: https://your-app.railway.app
+□ Click "Register" link
+□ Fill in form:
+  First Name: Test
+  Last Name: User
+  Email: test@example.com
+  Password: Test@123
+  Department: IT
+□ Click "Register" button
+
+Expected: "Registration successful" message
+Then: Redirected to login page
+
+If FAILS:
+  □ Open browser console (F12)
+  □ Check for error messages
+  □ Check Railway logs
+  □ Share error for help
+
+───────────────────────────────────────────────────────────────
+STEP 7: TEST LOGIN
+───────────────────────────────────────────────────────────────
+
+□ Try default manager account:
+  Email: manager@company.com
+  Password: Admin@123
+
+Expected: Redirected to manager dashboard
+
+□ Try your new test account:
+  Email: test@example.com
+  Password: Test@123
+
+Expected: Redirected to employee dashboard
+
+───────────────────────────────────────────────────────────────
+SUCCESS INDICATORS
+───────────────────────────────────────────────────────────────
+
+✅ Railway deployment: Success
+✅ MySQL service: Online
+✅ JWT_SECRET variable: Added
+✅ MYSQL_URL variable: Exists (auto-added)
+✅ Database schema: Imported
+✅ Health endpoint: Returns stats
+✅ Registration: Works
+✅ Login: Works
+
+───────────────────────────────────────────────────────────────
+TROUBLESHOOTING
+───────────────────────────────────────────────────────────────
+
+Problem: "Cannot GET /api/health"
+→ Read: FIX_CANNOT_GET_HEALTH.md
+
+Problem: Database connection error
+→ Check MYSQL_URL variable exists
+→ Check MySQL service is Online
+
+Problem: JWT error
+→ Check JWT_SECRET variable exists
+→ Check spelling is correct
+
+Problem: Table doesn't exist
+→ Import schema again (Step 4)
+
+Problem: Registration fails with 500 error
+→ Check Railway logs
+→ Check browser console
+→ Share error message
+
+───────────────────────────────────────────────────────────────
+HELPFUL FILES
+───────────────────────────────────────────────────────────────
+
+Quick Fix:           QUICK_RAILWAY_FIX.md
+Complete Guide:      FINAL_DEPLOYMENT_CHECKLIST.md
+Visual Flow:         DEPLOYMENT_FLOW.md
+Health Endpoint:     FIX_CANNOT_GET_HEALTH.md
+Environment Vars:    RAILWAY_ENV_SETUP.md
+Your Setup:          YOUR_RAILWAY_SETUP.md
+
+───────────────────────────────────────────────────────────────
+ESTIMATED TIME
+───────────────────────────────────────────────────────────────
+
+Step 1: Verify deployment      1 min
+Step 2: Add JWT_SECRET          2 min
+Step 3: Get MySQL details       1 min
+Step 4: Import schema           5 min
+Step 5: Test health             1 min
+Step 6: Test registration       1 min
+Step 7: Test login              1 min
+                        ─────────────
+                        Total: ~12 min
+
+───────────────────────────────────────────────────────────────
+NEED HELP?
+───────────────────────────────────────────────────────────────
+
+Share these three things:
+
+1. Railway logs (last 20 lines)
+2. Health endpoint response (JSON)
+3. Browser console error (if any)
+
+With this info, I can help debug immediately!
+
+═══════════════════════════════════════════════════════════════
